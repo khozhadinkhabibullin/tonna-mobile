@@ -1,0 +1,1179 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#17191b">
+  <title>Грузовой кабинет</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #17191b;
+      --ink-raised: #222529;
+      --ink-soft: #30343a;
+      --paper: #f2f0e9;
+      --paper-muted: #e7e3d9;
+      --paper-white: #fffdf8;
+      --muted: #615f59;
+      --rule: #cbc6b9;
+      --orange: #ff5c19;
+      --orange-deep: #a93208;
+      --green: #1f7242;
+      --red: #a92f25;
+      --body: Arial, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      --display: "Arial Narrow", "Roboto Condensed", Arial, system-ui, sans-serif;
+      --mono: ui-monospace, "SF Mono", Menlo, Consolas, "Roboto Mono", "Liberation Mono", "Courier New", monospace;
+    }
+    * { box-sizing: border-box; }
+    html, body { width: 100%; height: 100%; margin: 0; overflow: hidden; background: #101112; color: var(--ink); font-family: var(--body); -webkit-font-smoothing: antialiased; }
+    body { display: block; }
+    button, input, select, textarea { font: inherit; }
+    button { color: inherit; cursor: pointer; }
+    button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible, a:focus-visible, label.file-button:focus-within {
+      outline: 2px solid var(--orange-deep);
+      outline-offset: 2px;
+    }
+    ::selection { background: var(--orange); color: var(--ink); }
+    .hidden { display: none !important; }
+    .device { position: relative; width: 100%; height: 100vh; height: 100dvh; overflow: hidden; background: var(--paper); }
+    .app { height: 100%; min-height: 0; display: flex; flex-direction: column; overflow: hidden; }
+    .topbar {
+      flex: 0 0 calc(56px + env(safe-area-inset-top));
+      height: calc(56px + env(safe-area-inset-top));
+      padding: env(safe-area-inset-top) max(14px, env(safe-area-inset-right)) 0 max(14px, env(safe-area-inset-left));
+      display: flex; align-items: center; justify-content: space-between; gap: 12px;
+      background: var(--ink); color: var(--paper-white); border-bottom: 1px solid #3b3e42;
+    }
+    .wordmark { min-width: 0; display: flex; align-items: center; gap: 10px; font: 800 14px/1.1 var(--display); letter-spacing: .015em; }
+    .mark { flex: 0 0 22px; width: 22px; height: 22px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; transform: skewX(-12deg); }
+    .mark i { background: var(--orange); }
+    .mark i:nth-child(2), .mark i:nth-child(6) { opacity: .38; }
+    .role-chip { flex: 0 0 auto; max-width: 42%; color: #c7c8c5; font-size: 12px; text-align: right; overflow-wrap: anywhere; }
+    .screen { flex: 1 1 auto; min-height: 0; overflow: auto; overscroll-behavior: contain; scrollbar-width: thin; scrollbar-color: var(--orange) var(--paper-muted); padding: 0 max(16px, env(safe-area-inset-right)) 14px max(16px, env(safe-area-inset-left)); }
+    .screen::-webkit-scrollbar { width: 5px; }
+    .screen::-webkit-scrollbar-thumb { background: var(--orange); }
+    .bottom-nav {
+      z-index: 4; flex: 0 0 calc(56px + env(safe-area-inset-bottom)); height: calc(56px + env(safe-area-inset-bottom));
+      padding: 0 max(3px, env(safe-area-inset-right)) env(safe-area-inset-bottom) max(3px, env(safe-area-inset-left));
+      display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); background: var(--ink); border-top: 1px solid #3b3e42;
+    }
+    .nav-btn { min-width: 0; min-height: 48px; border: 0; border-bottom: 3px solid transparent; background: transparent; color: #c4c6c7; display: grid; place-content: center; justify-items: center; gap: 2px; padding: 3px 2px 0; font-size: 11px; line-height: 1.1; }
+    .nav-btn svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; }
+    .nav-btn span { overflow-wrap: anywhere; text-align: center; }
+    .nav-btn.active { color: var(--orange); border-bottom-color: var(--orange); font-weight: 700; }
+    .nav-btn:focus-visible { outline-offset: -3px; }
+    h1, h2, h3, p { margin-top: 0; }
+    h1, h2, h3 { font-family: var(--display); }
+    h1 { margin-bottom: 0; font-size: 25px; line-height: 1.15; font-weight: 800; letter-spacing: -.025em; overflow-wrap: anywhere; }
+    h2 { margin-bottom: 0; font-size: 18px; line-height: 1.2; font-weight: 800; }
+    .screen-title { min-height: 62px; display: flex; align-items: center; gap: 10px; padding: 12px 0; }
+    .screen-title h1 { min-width: 0; }
+    .back-button { flex: 0 0 44px; width: 44px; height: 44px; border: 1px solid var(--rule); background: transparent; display: grid; place-items: center; }
+    .back-button svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2; }
+    .section { border-bottom: 1px solid var(--rule); padding: 16px 0; }
+    .section:last-child { border-bottom: 0; }
+    .section-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 10px; }
+    .eyebrow { margin: 0 0 6px; color: var(--muted); font: 700 11px/1.2 var(--mono); letter-spacing: .035em; text-transform: uppercase; }
+    .intro { margin: 0 calc(-1 * max(16px, env(safe-area-inset-right))) 0 calc(-1 * max(16px, env(safe-area-inset-left))); padding: 18px max(16px, env(safe-area-inset-right)) 16px max(16px, env(safe-area-inset-left)); background: var(--ink-raised); color: var(--paper-white); border-bottom: 1px solid #3b3e42; }
+    .intro h1 { max-width: 100%; font-size: 26px; }
+    .primary-action { min-height: 52px; width: 100%; margin-top: 15px; padding: 0 14px; border: 0; background: var(--orange); color: var(--ink); display: flex; align-items: center; justify-content: space-between; gap: 12px; text-align: left; font: 800 14px/1.2 var(--display); letter-spacing: .015em; text-transform: uppercase; }
+    .primary-action svg { flex: 0 0 22px; width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2; }
+    .primary-action:hover { background: #ff7135; }
+    .primary-action:active { transform: translateY(1px); }
+    .text-button { min-height: 44px; padding: 8px 0; border: 0; background: transparent; color: var(--orange-deep); font-size: 13px; font-weight: 700; text-align: left; }
+    .manifest-list { border-top: 1px solid var(--rule); }
+    .manifest-item { width: 100%; min-width: 0; min-height: 64px; display: grid; grid-template-columns: 26px minmax(0, 1fr); gap: 10px; padding: 12px 0; border: 0; border-bottom: 1px solid var(--rule); background: transparent; text-align: left; }
+    .manifest-index { padding-top: 2px; color: var(--orange-deep); font: 700 12px/1 var(--mono); }
+    .manifest-main { min-width: 0; }
+    .manifest-route { display: block; font: 800 15px/1.25 var(--display); overflow-wrap: anywhere; }
+    .manifest-meta { display: block; margin-top: 4px; color: var(--muted); font-size: 12px; line-height: 1.35; overflow-wrap: anywhere; }
+    .status-badge { display: inline-flex; min-height: 26px; align-items: center; margin-top: 7px; padding: 4px 7px; background: #ffe0d1; color: var(--orange-deep); font: 700 11px/1.2 var(--mono); letter-spacing: .01em; }
+    .status-badge.assigned, .status-badge.delivered { background: #dce9df; color: #185a35; }
+    .status-badge.cancelled { background: #f1d9d5; color: #82251d; }
+    .status-badge.loading, .status-badge.in_transit { background: #ffe0d1; color: var(--orange-deep); }
+    .status-badge.searching { background: #ece4d0; color: #694b14; }
+    .empty-state { padding: 16px 0; color: var(--muted); font-size: 14px; line-height: 1.45; }
+    .report { padding: 16px 0 12px; border-bottom: 1px solid var(--rule); }
+    .period-switch { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); margin: 12px 0 16px; border: 1px solid #857f73; }
+    .period-option { min-height: 44px; border: 0; border-right: 1px solid #857f73; background: transparent; font-size: 13px; font-weight: 700; }
+    .period-option:last-child { border-right: 0; }
+    .period-option[aria-pressed="true"] { background: var(--ink); color: var(--paper-white); box-shadow: inset 0 -3px var(--orange); }
+    .chart-title { margin-bottom: 4px; font-size: 14px; font-weight: 700; }
+    .chart-note { margin: 0; color: var(--muted); font-size: 12px; line-height: 1.35; }
+    .bar-chart { min-height: 142px; display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); align-items: end; gap: 7px; padding: 12px 0 0; }
+    .bar-item { min-width: 0; display: grid; grid-template-rows: auto 70px minmax(26px, auto); align-items: end; justify-items: center; gap: 4px; }
+    .bar-value { max-width: 100%; font: 700 11px/1 var(--mono); font-variant-numeric: tabular-nums; }
+    .bar-track { width: min(26px, 75%); height: 70px; display: flex; align-items: end; background: #e1ddd3; }
+    .bar-fill { width: 100%; min-height: 0; background: var(--orange); }
+    .bar-label { width: 100%; color: var(--muted); font-size: 11px; line-height: 1.15; text-align: center; overflow-wrap: anywhere; }
+    .metric-strip { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border-bottom: 1px solid var(--rule); }
+    .metric { min-width: 0; padding: 12px 8px 12px 0; border-right: 1px solid var(--rule); }
+    .metric + .metric { padding-left: 10px; }
+    .metric:last-child { border-right: 0; }
+    .metric strong { display: block; font: 800 22px/1 var(--display); font-variant-numeric: tabular-nums; }
+    .metric span { display: block; margin-top: 6px; color: var(--muted); font-size: 12px; line-height: 1.25; }
+    .filter-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border: 1px solid #857f73; margin: 0 0 12px; }
+    .filter-button { min-width: 0; min-height: 52px; padding: 5px 2px; border: 0; border-right: 1px solid #857f73; background: transparent; display: grid; place-content: center; gap: 2px; font-size: 11px; line-height: 1.1; text-align: center; }
+    .filter-button:last-child { border-right: 0; }
+    .filter-button span { overflow-wrap: anywhere; }
+    .filter-button b { font: 700 12px/1 var(--mono); font-variant-numeric: tabular-nums; }
+    .filter-button[aria-pressed="true"] { background: var(--ink); color: var(--paper-white); box-shadow: inset 0 -3px var(--orange); }
+    .filter-bar { display: grid; grid-template-columns: 1fr; gap: 6px; margin-bottom: 12px; }
+    .filter-bar label { color: var(--muted); font-size: 12px; }
+    .filter-bar select { width: 100%; min-height: 48px; border: 1px solid #857f73; border-radius: 0; padding: 0 10px; background: var(--paper-white); color: var(--ink); font-size: 16px; }
+    .order-group-title { margin: 16px 0 0; padding: 8px 0; border-bottom: 1px solid var(--rule); color: var(--muted); font: 700 12px/1.3 var(--mono); }
+    .order-item { display: block; width: 100%; min-width: 0; padding: 13px 0; border: 0; border-bottom: 1px solid var(--rule); background: transparent; text-align: left; }
+    .order-item:active, .manifest-item:active { background: var(--paper-muted); }
+    .order-route { display: block; font: 800 16px/1.25 var(--display); overflow-wrap: anywhere; }
+    .order-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; margin-top: 6px; color: var(--muted); font-size: 12px; line-height: 1.35; overflow-wrap: anywhere; }
+    .order-meta .status-badge { margin-top: 0; }
+    .order-price { display: block; margin-top: 7px; font: 700 15px/1.3 var(--mono); font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+    .field { display: block; min-width: 0; margin-bottom: 14px; }
+    .field-label { display: block; margin-bottom: 6px; color: var(--muted); font-size: 13px; line-height: 1.25; font-weight: 700; }
+    .field input, .field select, .field textarea { width: 100%; min-width: 0; min-height: 48px; border: 1px solid #857f73; border-radius: 0; padding: 0 11px; background: var(--paper-white); color: var(--ink); font-size: 16px; line-height: 1.35; }
+    .field textarea { min-height: 88px; padding: 10px 11px; resize: vertical; }
+    .field input[aria-invalid="true"], .field select[aria-invalid="true"], .field textarea[aria-invalid="true"] { border-color: var(--red); }
+    .field-error { display: block; min-height: 0; margin-top: 5px; color: var(--red); font-size: 12px; line-height: 1.35; }
+    .field-error:empty { display: none; }
+    .field-hint { display: block; margin-top: 5px; color: var(--muted); font-size: 12px; line-height: 1.35; }
+    .field-row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+    .money-row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(104px, .72fr); gap: 8px; }
+    .unit-input { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; border: 1px solid #857f73; background: var(--paper-white); }
+    .unit-input input { border: 0; }
+    .unit-input:focus-within { outline: 2px solid var(--orange-deep); outline-offset: 2px; }
+    .unit-suffix { padding: 0 10px 0 4px; color: var(--muted); font-size: 14px; white-space: nowrap; }
+    .choice-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+    .choice { min-height: 50px; padding: 8px; border: 1px solid #857f73; background: var(--paper-white); text-align: left; font-size: 13px; line-height: 1.25; }
+    .choice[aria-pressed="true"] { border: 2px solid var(--orange-deep); padding: 7px; background: #fff2ea; font-weight: 700; }
+    .form-section { padding: 16px 0; border-bottom: 1px solid var(--rule); }
+    .form-section h2 { margin-bottom: 14px; font-size: 16px; }
+    .form-actions { padding: 14px 0 18px; }
+    .form-actions .primary-action { margin-top: 0; }
+    .form-error-summary { margin: 0 0 12px; color: var(--red); font-size: 13px; line-height: 1.4; }
+    .detail-hero { margin: 0 calc(-1 * max(16px, env(safe-area-inset-right))) 0 calc(-1 * max(16px, env(safe-area-inset-left))); padding: 16px max(16px, env(safe-area-inset-right)) 15px max(16px, env(safe-area-inset-left)); background: var(--ink-raised); color: var(--paper-white); }
+    .detail-hero h2 { font-size: clamp(21px, 6vw, 29px); line-height: 1.16; overflow-wrap: anywhere; }
+    .detail-hero p { margin: 8px 0 0; color: #d0d0cd; font-size: 14px; line-height: 1.4; overflow-wrap: anywhere; }
+    .detail-hero .status-badge { margin-top: 12px; }
+    .route-scheme { padding: 16px 0; border-bottom: 1px solid var(--rule); }
+    .scheme-track { display: grid; grid-template-columns: minmax(0, 1fr) 34px minmax(0, 1fr); align-items: center; gap: 8px; margin-top: 12px; }
+    .scheme-point { min-width: 0; }
+    .scheme-point b { display: block; color: var(--orange-deep); font: 800 14px/1 var(--mono); }
+    .scheme-point span { display: block; margin-top: 5px; font-size: 13px; line-height: 1.3; overflow-wrap: anywhere; }
+    .scheme-point:last-child { text-align: right; }
+    .scheme-line { height: 2px; background: var(--orange); }
+    .scheme-note { margin: 9px 0 0; color: var(--muted); font-size: 12px; line-height: 1.4; }
+    .map-link { display: inline-flex; min-height: 48px; align-items: center; margin-top: 10px; padding: 0 12px; background: var(--orange); color: var(--ink); font-size: 13px; font-weight: 800; text-decoration: none; }
+    .map-link:hover { background: #ff7135; }
+    .timeline { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0; padding: 15px 0; border-bottom: 1px solid var(--rule); }
+    .timeline-step { min-width: 0; padding-right: 9px; border-right: 1px solid var(--rule); }
+    .timeline-step + .timeline-step { padding-left: 9px; }
+    .timeline-step:last-child { padding-right: 0; border-right: 0; }
+    .timeline-step b { display: block; font-size: 12px; line-height: 1.25; }
+    .timeline-step span { display: block; margin-top: 5px; color: var(--muted); font-size: 12px; line-height: 1.3; overflow-wrap: anywhere; }
+    .detail-data { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 12px; padding: 4px 0; border-bottom: 1px solid var(--rule); }
+    .data-item { min-width: 0; padding: 10px 0; border-bottom: 1px solid var(--rule); }
+    .data-item:nth-last-child(-n+2) { border-bottom: 0; }
+    .data-label { display: block; color: var(--muted); font-size: 12px; line-height: 1.2; }
+    .data-value { display: block; margin-top: 4px; font-size: 14px; line-height: 1.3; overflow-wrap: anywhere; }
+    .detail-action { margin-top: 14px; }
+    .doc-row, .photo-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 58px; padding: 10px 0; border-top: 1px solid var(--rule); }
+    .doc-copy, .photo-copy { min-width: 0; }
+    .doc-copy b, .photo-copy b { display: block; font-size: 14px; line-height: 1.3; overflow-wrap: anywhere; }
+    .doc-copy span, .photo-copy span { display: block; margin-top: 4px; color: var(--muted); font-size: 12px; line-height: 1.35; overflow-wrap: anywhere; }
+    .small-action { flex: 0 0 auto; min-height: 44px; padding: 7px 10px; border: 1px solid var(--ink); background: transparent; font-size: 12px; font-weight: 700; }
+    .file-button { position: relative; overflow: hidden; display: inline-flex; align-items: center; justify-content: center; }
+    .file-button input { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
+    .file-button input:focus-visible { outline: 0; }
+    .profile-hero { display: grid; grid-template-columns: 90px minmax(0, 1fr); gap: 14px; align-items: center; padding: 16px 0; border-bottom: 1px solid var(--rule); }
+    .profile-image-button { width: 90px; height: 90px; padding: 0; border: 1px solid #857f73; background: var(--paper-muted); }
+    .profile-image-button img, .vehicle-image-button img { width: 100%; height: 100%; object-fit: cover; }
+    .profile-copy { min-width: 0; }
+    .profile-copy h2 { overflow-wrap: anywhere; }
+    .profile-copy p { margin: 6px 0 0; color: var(--muted); font-size: 13px; line-height: 1.4; overflow-wrap: anywhere; }
+    .profile-fields { padding: 0; }
+    .profile-row { padding: 12px 0; border-bottom: 1px solid var(--rule); }
+    .profile-row span { display: block; color: var(--muted); font-size: 12px; }
+    .profile-row b { display: block; margin-top: 4px; font-size: 15px; line-height: 1.4; overflow-wrap: anywhere; word-break: break-word; }
+    .profile-section-title { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin: 16px 0 8px; }
+    .vehicle-image-button { display: block; width: 100%; height: 155px; padding: 0; border: 1px solid #857f73; background: var(--paper-muted); }
+    .profile-footer { padding: 14px 0 4px; }
+    .logout-button { min-height: 48px; padding: 0 12px; border: 1px solid var(--red); background: transparent; color: var(--red); font-size: 14px; font-weight: 700; }
+    .photo-viewer { position: absolute; z-index: 20; inset: 0; display: flex; flex-direction: column; background: #101112; color: var(--paper-white); padding-top: env(safe-area-inset-top); padding-right: env(safe-area-inset-right); padding-bottom: env(safe-area-inset-bottom); padding-left: env(safe-area-inset-left); }
+    .viewer-toolbar { flex: 0 0 52px; min-height: 52px; display: grid; grid-template-columns: 52px minmax(0, 1fr) 52px; align-items: center; border-bottom: 1px solid #3b3e42; }
+    .viewer-toolbar button, .viewer-nav { min-width: 48px; min-height: 48px; border: 0; background: transparent; color: var(--paper-white); display: grid; place-items: center; font-size: 23px; }
+    .viewer-counter { color: #e4e4e0; font: 700 13px/1 var(--mono); text-align: center; font-variant-numeric: tabular-nums; }
+    .viewer-stage { flex: 1 1 auto; min-height: 0; display: grid; grid-template-rows: minmax(0, 1fr); grid-template-columns: 48px minmax(0, 1fr) 48px; align-items: center; justify-items: center; gap: 3px; padding: 8px 4px; }
+    .viewer-nav:disabled { opacity: .35; cursor: default; }
+    .viewer-image-wrap { position: relative; width: 100%; height: 100%; min-width: 0; min-height: 0; display: grid; place-items: center; overflow: hidden; }
+    .viewer-image { position: absolute; inset: 0; display: block; max-width: 100%; max-height: 100%; width: 100%; height: 100%; object-fit: contain; touch-action: pan-y pinch-zoom; }
+    .image-fallback { max-width: 90%; color: #deded8; font-size: 14px; line-height: 1.4; text-align: center; overflow-wrap: anywhere; }
+    .thumbnail-rail { flex: 0 0 74px; min-height: 74px; display: flex; align-items: center; gap: 8px; overflow-x: auto; padding: 8px max(8px, env(safe-area-inset-right)) 8px max(8px, env(safe-area-inset-left)); border-top: 1px solid #3b3e42; }
+    .thumbnail { flex: 0 0 54px; width: 54px; height: 54px; padding: 2px; border: 1px solid #6b7075; background: #222529; }
+    .thumbnail[aria-current="true"] { border: 2px solid var(--orange); }
+    .thumbnail img { width: 100%; height: 100%; object-fit: cover; }
+    .toast { position: absolute; z-index: 30; left: max(12px, env(safe-area-inset-left)); right: max(12px, env(safe-area-inset-right)); bottom: calc(68px + env(safe-area-inset-bottom)); padding: 12px 14px; background: var(--ink); color: var(--paper-white); border-top: 3px solid var(--orange); font-size: 13px; line-height: 1.4; }
+    .auth { position: absolute; z-index: 10; inset: 0; overflow: auto; overscroll-behavior: contain; background: var(--ink); color: var(--paper-white); padding-top: env(safe-area-inset-top); padding-right: max(16px, env(safe-area-inset-right)); padding-bottom: max(18px, env(safe-area-inset-bottom)); padding-left: max(16px, env(safe-area-inset-left)); }
+    .auth-art { min-height: 110px; padding: 16px 0; border-bottom: 1px solid #3b3e42; display: flex; align-items: center; }
+    .auth-art .wordmark { font-size: 16px; }
+    .auth-body { max-width: 520px; margin: 0 auto; padding: 18px 0 28px; }
+    .auth-body h1 { font-size: 28px; }
+    .auth-body > p { margin: 7px 0 16px; color: #c4c6c7; font-size: 14px; line-height: 1.45; }
+    .auth-tabs { display: grid; grid-template-columns: 1fr 1fr; margin: 0 0 16px; border: 1px solid #6b7075; }
+    .auth-tabs button { min-height: 46px; border: 0; border-right: 1px solid #6b7075; background: transparent; color: var(--paper-white); font-size: 13px; font-weight: 700; }
+    .auth-tabs button:last-child { border-right: 0; }
+    .auth-tabs button[aria-selected="true"] { background: var(--orange); color: var(--ink); }
+    .auth .field-label { color: #deded8; }
+    .auth .field input { border-color: #6b7075; background: var(--ink-raised); color: var(--paper-white); }
+    .auth .field input[aria-invalid="true"] { border-color: #ff857b; }
+    .auth .field-error { color: #ffaaa3; }
+    .auth-note { margin: 12px 0 0; color: #c4c6c7; font-size: 12px; line-height: 1.45; }
+    .role-options { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .role-option { min-height: 48px; border: 1px solid #6b7075; background: transparent; color: var(--paper-white); font-size: 13px; font-weight: 700; }
+    .role-option[aria-pressed="true"] { border-color: var(--orange); background: var(--orange); color: var(--ink); }
+    .auth .primary-action { min-height: 52px; }
+    .auth .form-error-summary { color: #ffaaa3; }
+    @media (max-height: 380px) and (orientation: landscape) {
+      .topbar { flex-basis: calc(40px + env(safe-area-inset-top)); height: calc(40px + env(safe-area-inset-top)); }
+      .mark { width: 18px; height: 18px; flex-basis: 18px; }
+      .wordmark { font-size: 13px; }
+      .bottom-nav { flex-basis: calc(48px + env(safe-area-inset-bottom)); height: calc(48px + env(safe-area-inset-bottom)); }
+      .nav-btn { min-height: 44px; gap: 0; font-size: 11px; }
+      .nav-btn svg { display: none; }
+      .screen-title { min-height: 48px; padding: 5px 0; }
+      .screen-title h1 { font-size: 21px; }
+      .section { padding-top: 11px; padding-bottom: 11px; }
+      .intro { padding-top: 10px; padding-bottom: 10px; }
+      .intro h1 { font-size: 22px; }
+      .primary-action { min-height: 46px; margin-top: 8px; }
+      .auth-art { min-height: 58px; padding: 7px 0; }
+      .auth-art .wordmark { font-size: 14px; }
+      .auth-body { padding-top: 10px; }
+      .auth-body h1 { font-size: 22px; }
+      .auth-body > p { margin-bottom: 10px; }
+      .auth .field { margin-bottom: 9px; }
+    }
+    @media (min-width: 600px) and (min-height: 500px) {
+      body { display: grid; place-items: center; padding: 24px; }
+      .device { width: min(390px, calc(100vw - 48px)); height: min(844px, calc(100dvh - 48px)); border: 1px solid #444; box-shadow: 0 20px 60px rgba(0, 0, 0, .38); }
+    }
+    @media (max-width: 359px) {
+      .screen { padding-right: max(12px, env(safe-area-inset-right)); padding-left: max(12px, env(safe-area-inset-left)); }
+      .intro, .detail-hero { margin-right: calc(-1 * max(12px, env(safe-area-inset-right))); margin-left: calc(-1 * max(12px, env(safe-area-inset-left))); padding-right: max(12px, env(safe-area-inset-right)); padding-left: max(12px, env(safe-area-inset-left)); }
+      .filter-button { font-size: 10.5px; }
+      .filter-button b { font-size: 11px; }
+      .money-row { grid-template-columns: minmax(0, 1fr) minmax(92px, .7fr); }
+      .scheme-track { grid-template-columns: minmax(0, 1fr) 22px minmax(0, 1fr); gap: 5px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <main class="device" aria-label="Грузовой кабинет">
+    <section class="auth" id="authScreen" aria-labelledby="authTitle">
+      <div class="auth-art"><div class="wordmark"><span class="mark" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></span><span>ГРУЗОВОЙ КАБИНЕТ</span></div></div>
+      <div class="auth-body">
+        <h1 id="authTitle" tabindex="-1">Вход</h1>
+        <p id="authDescription">Войдите в локальный кабинет или зарегистрируйте профиль на этом устройстве.</p>
+        <div class="auth-tabs" role="tablist" aria-label="Способ входа">
+          <button type="button" id="loginTab" role="tab" aria-selected="true" aria-pressed="true">Вход</button>
+          <button type="button" id="registerTab" role="tab" aria-selected="false" aria-pressed="false">Регистрация</button>
+        </div>
+        <form id="loginForm" novalidate>
+          <label class="field" for="loginPhone"><span class="field-label">Номер телефона</span><input id="loginPhone" name="phone" type="tel" inputmode="tel" autocomplete="tel" value="+7 777 123 45 67" required aria-describedby="loginPhoneError"><span class="field-error" id="loginPhoneError"></span></label>
+          <label class="field" for="loginCode"><span class="field-label">Код доступа</span><input id="loginCode" name="code" type="password" autocomplete="current-password" required aria-describedby="loginCodeError"><span class="field-error" id="loginCodeError"></span></label>
+          <p class="form-error-summary" id="loginSummary" aria-live="polite"></p>
+          <button class="primary-action" type="submit"><span>Войти</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+          <p class="auth-note">Вход работает только в этой вкладке. Телефон и код никуда не отправляются.</p>
+        </form>
+        <form id="registerForm" class="hidden" novalidate>
+          <label class="field" for="registerName"><span class="field-label">Имя и фамилия</span><input id="registerName" name="name" type="text" autocomplete="name" required aria-describedby="registerNameError"><span class="field-error" id="registerNameError"></span></label>
+          <label class="field" for="registerPhone"><span class="field-label">Номер телефона</span><input id="registerPhone" name="phone" type="tel" inputmode="tel" autocomplete="tel" required aria-describedby="registerPhoneError"><span class="field-error" id="registerPhoneError"></span></label>
+          <label class="field" for="registerEmail"><span class="field-label">Email</span><input id="registerEmail" name="email" type="email" inputmode="email" autocomplete="email" required aria-describedby="registerEmailError"><span class="field-error" id="registerEmailError"></span></label>
+          <fieldset class="field" style="border:0;padding:0;margin-left:0;margin-right:0"><legend class="field-label">Роль в кабинете</legend><div class="role-options"><button class="role-option" type="button" data-register-role="customer" aria-pressed="true">Заказчик</button><button class="role-option" type="button" data-register-role="carrier" aria-pressed="false">Перевозчик</button></div></fieldset>
+          <p class="form-error-summary" id="registerSummary" aria-live="polite"></p>
+          <button class="primary-action" type="submit"><span>Создать профиль</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+          <p class="auth-note">Профиль создаётся в памяти этой вкладки. Регистрация не отправляет данные на сервер.</p>
+        </form>
+      </div>
+    </section>
+
+    <div class="app hidden" id="app" inert>
+      <header class="topbar">
+        <div class="wordmark"><span class="mark" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></span><span>Грузовой кабинет</span></div>
+        <span class="role-chip" id="roleLabel">Заказчик</span>
+      </header>
+      <section class="screen hidden" id="homeScreen" aria-labelledby="homeHeading" tabindex="-1">
+        <div class="intro">
+          <p class="eyebrow" style="color:#d0d0cd">Диспетчерская</p>
+          <h1 id="homeHeading" tabindex="-1">Доброе утро, <span id="greetingName">Алексей</span></h1>
+          <button class="primary-action" id="homeAction" type="button"><span id="homeActionText">Создать заказ</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>
+        </div>
+        <section class="section" aria-labelledby="activeHeading">
+          <div class="section-heading"><h2 id="activeHeading">Активные заказы</h2><button class="text-button" id="allOrdersButton" type="button">Все заказы</button></div>
+          <div class="manifest-list" id="homeActiveList"></div>
+        </section>
+        <section class="report" aria-labelledby="reportHeading">
+          <p class="eyebrow">Отчёт</p>
+          <div class="section-heading"><h2 id="reportHeading">Заказы по месяцам</h2></div>
+          <div class="period-switch" role="group" aria-label="Период отчёта">
+            <button class="period-option" type="button" data-range="month" aria-pressed="true">Месяцы</button>
+            <button class="period-option" type="button" data-range="quarter" aria-pressed="false">Кварталы</button>
+            <button class="period-option" type="button" data-range="year" aria-pressed="false">Годы</button>
+          </div>
+          <p class="chart-title" id="chartTitle">Заказы по месяцам</p>
+          <p class="chart-note" id="chartNote"></p>
+          <div class="bar-chart" id="reportChart" role="img" aria-label="Количество заказов за выбранные периоды"></div>
+        </section>
+        <div class="metric-strip" aria-label="Счётчики выбранного периода">
+          <div class="metric"><strong id="metricOrders">0</strong><span>Заказы</span></div>
+          <div class="metric"><strong id="metricActive">0</strong><span>В работе</span></div>
+          <div class="metric"><strong id="metricDelivered">0</strong><span>Завершены</span></div>
+        </div>
+      </section>
+
+      <section class="screen hidden" id="ordersScreen" aria-labelledby="ordersHeading" tabindex="-1">
+        <div class="screen-title"><h1 id="ordersHeading" tabindex="-1">Мои заказы</h1></div>
+        <div class="filter-grid" role="group" aria-label="Фильтр по статусу">
+          <button class="filter-button" type="button" data-filter="active" aria-pressed="true"><span>Активные</span><b data-count="active">0</b></button>
+          <button class="filter-button" type="button" data-filter="waiting" aria-pressed="false"><span>Ожидают</span><b data-count="waiting">0</b></button>
+          <button class="filter-button" type="button" data-filter="completed" aria-pressed="false"><span>Завершены</span><b data-count="completed">0</b></button>
+          <button class="filter-button" type="button" data-filter="cancelled" aria-pressed="false"><span>Отменены</span><b data-count="cancelled">0</b></button>
+        </div>
+        <div class="filter-bar"><label for="monthFilter">Месяц заказа</label><select id="monthFilter"><option value="all">Все месяцы</option></select></div>
+        <div id="ordersList" class="order-list" aria-live="polite"></div>
+      </section>
+
+      <section class="screen hidden" id="createScreen" aria-labelledby="createHeading" tabindex="-1">
+        <div class="screen-title"><h1 id="createHeading" tabindex="-1">Новый заказ</h1></div>
+        <form id="createForm" novalidate>
+          <div class="form-section">
+            <h2>Маршрут</h2>
+            <label class="field" for="origin"><span class="field-label">Откуда</span><input id="origin" name="origin" type="text" autocomplete="off" required aria-describedby="originError"><span class="field-error" id="originError"></span></label>
+            <label class="field" for="destination"><span class="field-label">Куда</span><input id="destination" name="destination" type="text" autocomplete="off" required aria-describedby="destinationError"><span class="field-error" id="destinationError"></span></label>
+          </div>
+          <div class="form-section">
+            <h2>Груз и транспорт</h2>
+            <fieldset class="field" style="border:0;padding:0;margin-left:0;margin-right:0"><legend class="field-label">Тип груза</legend><div class="choice-grid" id="cargoChoices">
+              <button class="choice" type="button" data-cargo="Паллеты" aria-pressed="true">Паллеты</button>
+              <button class="choice" type="button" data-cargo="Навалочный груз" aria-pressed="false">Навалочный груз</button>
+              <button class="choice" type="button" data-cargo="Рефрижераторный груз" aria-pressed="false">Рефрижераторный груз</button>
+              <button class="choice" type="button" data-cargo="Опасный груз" aria-pressed="false">Опасный груз</button>
+            </div></fieldset>
+            <label class="field" for="vehicleType"><span class="field-label">Тип кузова</span><select id="vehicleType" name="vehicleType"><option>Тентованный</option><option>Рефрижератор</option><option>Бортовой</option><option>Самосвал</option><option>Контейнеровоз</option></select></label>
+            <div class="field-row">
+              <label class="field" for="weight"><span class="field-label">Вес</span><span class="unit-input"><input id="weight" name="weight" type="text" inputmode="decimal" autocomplete="off" aria-label="Вес груза" aria-describedby="weightError"><span class="unit-suffix">т</span></span><span class="field-error" id="weightError"></span></label>
+              <label class="field" for="volume"><span class="field-label">Объём</span><span class="unit-input"><input id="volume" name="volume" type="text" inputmode="decimal" autocomplete="off" aria-label="Объём груза" aria-describedby="volumeError"><span class="unit-suffix">м³</span></span><span class="field-error" id="volumeError"></span></label>
+            </div>
+          </div>
+          <div class="form-section">
+            <h2>Цена и погрузка</h2>
+            <div class="money-row">
+              <label class="field" for="amount"><span class="field-label">Сумма</span><input id="amount" name="amount" type="text" inputmode="decimal" autocomplete="off" required aria-describedby="amountError amountHint"><span class="field-error" id="amountError"></span><span class="field-hint" id="amountHint">Можно указать до двух знаков после запятой.</span></label>
+              <label class="field" for="currency"><span class="field-label">Валюта</span><select id="currency" name="currency"><option value="KZT" selected>KZT · ₸</option><option value="KGS">KGS · сом</option><option value="RUB">RUB · ₽</option><option value="USD">USD · $</option><option value="EUR">EUR · €</option></select></label>
+            </div>
+            <label class="field" for="loadingDate"><span class="field-label">Плановая дата погрузки</span><input id="loadingDate" name="loadingDate" type="date"></label>
+          </div>
+          <div class="form-section">
+            <h2>Дополнительно</h2>
+            <label class="field" for="comment"><span class="field-label">Комментарий</span><textarea id="comment" name="comment" rows="3"></textarea></label>
+            <label class="field" for="cmrRequired"><span class="field-label">Документы</span><select id="cmrRequired" name="cmrRequired"><option value="no">Без обязательного CMR</option><option value="yes">Нужен CMR</option></select></label>
+          </div>
+          <p class="form-error-summary" id="createSummary" aria-live="polite"></p>
+          <div class="form-actions"><button class="primary-action" type="submit"><span>Опубликовать заказ</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></div>
+        </form>
+      </section>
+
+      <section class="screen hidden" id="detailScreen" aria-labelledby="detailHeading" tabindex="-1">
+        <div class="screen-title"><button class="back-button" type="button" data-back aria-label="Назад к списку"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></button><h1 id="detailHeading" tabindex="-1">Заказ</h1></div>
+        <div class="detail-hero"><h2 id="detailRoute"></h2><p id="detailSummary"></p><span id="detailStatus" class="status-badge"></span></div>
+        <section class="route-scheme" aria-labelledby="schemeHeading">
+          <p class="eyebrow" id="schemeHeading">Схема маршрута</p>
+          <div class="scheme-track"><div class="scheme-point"><b>А</b><span id="schemeOrigin"></span></div><div class="scheme-line" aria-hidden="true"></div><div class="scheme-point"><b>Б</b><span id="schemeDestination"></span></div></div>
+          <p class="scheme-note" id="mapNotice"></p>
+          <a class="map-link hidden" id="mapLink" target="_blank" rel="noopener noreferrer">Открыть маршрут в 2ГИС</a>
+        </section>
+        <section class="timeline" aria-label="Этапы перевозки">
+          <div class="timeline-step"><b>Погрузка</b><span id="loadingTime">—</span></div>
+          <div class="timeline-step"><b>Отправление / в пути</b><span id="departedTime">—</span></div>
+          <div class="timeline-step"><b>Доставка</b><span id="deliveredTime">—</span></div>
+        </section>
+        <div class="detail-data" id="detailData"></div>
+        <div id="detailActionArea"></div>
+        <section class="section" aria-labelledby="documentsHeading">
+          <div class="section-heading"><h2 id="documentsHeading">Документы</h2></div>
+          <div class="doc-row"><div class="doc-copy"><b>CMR-накладная</b><span id="documentState">Файл не добавлен</span></div><label class="small-action file-button">Выбрать файл<input id="documentInput" type="file" accept=".pdf,.jpg,.jpeg,.png,.webp,application/pdf,image/*" aria-label="Выбрать файл CMR"></label></div>
+        </section>
+        <section class="section" aria-labelledby="cargoPhotosHeading">
+          <div class="section-heading"><h2 id="cargoPhotosHeading">Фото груза</h2><span id="cargoPhotoCount" class="field-hint"></span></div>
+          <div class="photo-row"><div class="photo-copy"><b>Фотографии перевозки</b><span id="cargoPhotoState">Фотографии не добавлены</span></div><button class="small-action hidden" id="openCargoPhotos" type="button">Открыть</button></div>
+          <label class="small-action file-button">Добавить фото<input id="cargoPhotoInput" type="file" accept="image/*" multiple aria-label="Добавить несколько фотографий груза"></label>
+        </section>
+      </section>
+
+      <section class="screen hidden" id="profileScreen" aria-labelledby="profileHeading" tabindex="-1">
+        <div class="screen-title"><h1 id="profileHeading" tabindex="-1">Профиль</h1></div>
+        <div class="profile-hero">
+          <button class="profile-image-button" id="openProfilePhotos" type="button" aria-label="Открыть фото профиля"><img id="profileImage" src="assets/profile-portrait.webp" alt="Портрет профиля"></button>
+          <div class="profile-copy"><h2 id="profileName"></h2><p id="profilePhotoCount"></p><label class="small-action file-button">Добавить фото<input id="profilePhotoInput" type="file" accept="image/*" multiple aria-label="Добавить фотографии профиля"></label></div>
+        </div>
+        <div class="profile-fields">
+          <div class="profile-row"><span>Роль</span><b id="profileRole"></b></div>
+          <div class="profile-row"><span>Телефон</span><b id="profilePhone"></b></div>
+          <div class="profile-row"><span>Email</span><b id="profileEmail"></b></div>
+        </div>
+        <section class="section hidden" id="vehicleSection" aria-labelledby="vehicleHeading">
+          <div class="profile-section-title"><h2 id="vehicleHeading">Транспорт</h2><span id="vehiclePhotoCount" class="field-hint"></span></div>
+          <button class="vehicle-image-button" id="openVehiclePhotos" type="button" aria-label="Открыть фотографии транспорта"><img id="vehicleImage" src="assets/vehicle-truck.webp" alt="Грузовой автомобиль"></button>
+          <label class="small-action file-button" style="margin-top:10px">Добавить фото транспорта<input id="vehiclePhotoInput" type="file" accept="image/*" multiple aria-label="Добавить фотографии транспорта"></label>
+        </section>
+        <div class="profile-footer"><button class="logout-button" id="logoutButton" type="button">Выйти</button></div>
+      </section>
+
+      <nav class="bottom-nav" aria-label="Главная навигация">
+        <button class="nav-btn" type="button" data-nav="home"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m3 11 9-7 9 7v9H3zM9 20v-6h6v6"/></svg><span>Главная</span></button>
+        <button class="nav-btn" type="button" data-nav="orders"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h14v16H5zM8 8h8M8 12h8M8 16h5"/></svg><span>Заказы</span></button>
+        <button class="nav-btn" type="button" data-nav="create" id="createNav"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg><span>Создать</span></button>
+        <button class="nav-btn" type="button" data-nav="profile"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8ZM4 21a8 8 0 0 1 16 0"/></svg><span>Профиль</span></button>
+      </nav>
+    </div>
+
+    <section class="photo-viewer hidden" id="photoViewer" role="dialog" aria-modal="true" aria-label="Просмотр фотографий" aria-hidden="true" tabindex="-1">
+      <div class="viewer-toolbar"><button id="closeViewer" type="button" aria-label="Закрыть просмотр">×</button><span id="photoCounter" class="viewer-counter" aria-live="polite">0 из 0</span><span aria-hidden="true"></span></div>
+      <div class="viewer-stage" id="viewerStage"><button class="viewer-nav" id="previousPhoto" type="button" aria-label="Предыдущее фото">‹</button><div class="viewer-image-wrap"><img class="viewer-image" id="viewerImage" alt=""><span class="image-fallback hidden" id="viewerFallback">Не удалось открыть этот файл.</span></div><button class="viewer-nav" id="nextPhoto" type="button" aria-label="Следующее фото">›</button></div>
+      <div class="thumbnail-rail" id="thumbnailRail" aria-label="Миниатюры фотографий"></div>
+    </section>
+    <div class="toast hidden" id="toast" role="status" aria-live="polite"></div>
+  </main>
+  <script>
+    (() => {
+      const $ = (selector, root = document) => root.querySelector(selector);
+      const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
+      const ACTIVE = new Set(["assigned", "loading", "in_transit"]);
+      const CURRENCIES = { KZT: "₸", KGS: "сом", RUB: "₽", USD: "$", EUR: "€" };
+      const STATUS = {
+        searching: "Ожидает перевозчика", assigned: "Перевозчик назначен", loading: "Погрузка",
+        in_transit: "В пути", delivered: "Завершён", cancelled: "Отменён"
+      };
+      const screens = { home: $("#homeScreen"), orders: $("#ordersScreen"), create: $("#createScreen"), detail: $("#detailScreen"), profile: $("#profileScreen") };
+      const screenScroll = Object.create(null);
+      const users = [];
+      const profilePhotos = [{ id: "portrait", src: "assets/profile-portrait.webp", alt: "Портрет профиля" }];
+      const vehiclePhotos = [{ id: "truck", src: "assets/vehicle-truck.webp", alt: "Грузовой автомобиль" }];
+      let profile = null;
+      let currentState = { view: "auth", scrollTop: 0 };
+      let selectedFilter = "active";
+      let selectedMonth = "all";
+      let reportRange = "month";
+      let selectedCargo = "Паллеты";
+      let currentGallery = [];
+      let galleryIndex = 0;
+      let viewerReturnElement = null;
+      let toastTimer = 0;
+      let selectedRegisterRole = "customer";
+      const orders = createOrders();
+      let createdCounter = Math.max(...orders.map(order => Number(order.id.slice(3)))) + 1;
+
+      function dateAtMonthOffset(offset, day = 10) {
+        const now = new Date();
+        const date = new Date(now.getFullYear(), now.getMonth() - offset, 1, 9, 0, 0, 0);
+        date.setDate(Math.min(day, new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate()));
+        return date;
+      }
+      function plusDays(date, days) { const next = new Date(date); next.setDate(next.getDate() + days); return next; }
+      function createOrders() {
+        const routes = [
+          ["Алматы", "Караганда", "Металлопрокат", 18.5, "Тентованный", 480000, "KZT", 0, "in_transit"],
+          ["Алматы", "Караганда", "Упакованное оборудование", 12, "Тентованный", 530000, "KZT", 0, "searching"],
+          ["Астана", "Караганда", "Оборудование", 14, "Тентованный", 375000, "KZT", 0, "assigned"],
+          ["Шымкент", "Тараз", "Строительные материалы", 10, "Бортовой", 210000, "KZT", 0, "loading"],
+          ["Каскелен", "Бишкек", "Сборный груз", 8, "Бортовой", 185000, "KZT", 1, "delivered"],
+          ["Талдыкорган", "Алматы", "Овощи в ящиках", 5, "Рефрижератор", 160000, "KZT", 3, "delivered"],
+          ["Астана", "Павлодар", "Строительные материалы", 16, "Тентованный", 320000, "KZT", 5, "cancelled"],
+          ["Шымкент", "Алматы", "Паллеты с продуктами", 9, "Тентованный", 275000, "KZT", 7, "delivered"],
+          ["Караганда", "Астана", "Металлоконструкции", 20, "Бортовой", 410000, "KZT", 9, "delivered"],
+          ["Бишкек", "Алматы", "Бытовая техника", 7, "Тентованный", 210000, "KGS", 12, "delivered"],
+          ["Костанай", "Караганда", "Зерно", 22, "Самосвал", 360000, "KZT", 14, "delivered"],
+          ["Алматы", "Тараз", "Мебель", 6, "Тентованный", 190000, "KZT", 17, "delivered"],
+          ["Актобе", "Астана", "Промышленное сырьё", 18, "Тентованный", 670000, "KZT", 20, "delivered"],
+          ["Усть-Каменогорск", "Алматы", "Оборудование", 14, "Тентованный", 590000, "KZT", 24, "delivered"],
+          ["Кызылорда", "Шымкент", "Упакованный груз", 10, "Тентованный", 230000, "KZT", 29, "delivered"],
+          ["Павлодар", "Астана", "Пиломатериалы", 17, "Бортовой", 305000, "KZT", 35, "delivered"],
+          ["Тараз", "Караганда", "Текстиль", 11, "Тентованный", 445000, "KZT", 42, "delivered"],
+          ["Алматы", "Бишкек", "Крупная бытовая техника", 4, "Тентованный", 200000, "KGS", 50, "delivered"]
+        ];
+        const now = new Date();
+        return routes.map((row, index) => {
+          const [origin, destination, cargo, weight, vehicle, amount, currency, offset, status] = row;
+          let created = offset === 0 ? plusDays(now, -(index + 1)) : dateAtMonthOffset(offset, 4 + (index % 18));
+          if (index === 0) created = plusDays(now, -3);
+          if (index === 1) created = plusDays(now, -1);
+          const assignedAt = ["assigned", "loading", "in_transit", "delivered"].includes(status) ? plusDays(created, 1) : null;
+          const loadingAt = ["loading", "in_transit", "delivered"].includes(status) ? plusDays(created, 2) : null;
+          const departedAt = ["in_transit", "delivered"].includes(status) ? plusDays(created, 2) : null;
+          const deliveredAt = status === "delivered" ? plusDays(created, 3) : null;
+          return {
+            id: `KZ-${2048 + index}`, ownerId: "customer-seed", assignedCarrierId: status === "searching" ? null : "carrier-seed",
+            origin, destination, cargo, weight, volume: index === 0 ? 82 : null, vehicle, amount, currency,
+            status, createdAt: created.toISOString(), assignedAt: assignedAt?.toISOString() || null,
+            loadingAt: loadingAt?.toISOString() || null, departedAt: departedAt?.toISOString() || null,
+            deliveredAt: deliveredAt?.toISOString() || null,
+            cancelledAt: status === "cancelled" ? plusDays(created, 1).toISOString() : null,
+            cmrRequired: index === 0 || index === 4, plannedLoadingDate: null, comment: "", document: null, photos: [],
+            coordinates: coordinatesFor(origin, destination)
+          };
+        });
+      }
+      function normalizeCity(value) { return String(value || "").trim().toLocaleLowerCase("ru-RU").replaceAll("ё", "е"); }
+      function coordinatesFor(origin, destination) {
+        const known = new Map([["алматы", ["76.8512", "43.2220"]], ["караганда", ["73.1094", "49.8047"]]]);
+        const a = known.get(normalizeCity(origin));
+        const b = known.get(normalizeCity(destination));
+        return a && b ? [a, b] : null;
+      }
+      function normalizePhone(value) { return String(value || "").replace(/\D/g, ""); }
+      function isPhoneValid(value) { const digits = normalizePhone(value); return digits.length >= 10 && digits.length <= 15; }
+      function localDateKey(value) { const date = new Date(value); return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`; }
+      function formatDate(value, options = {}) {
+        if (!value) return "—";
+        return new Intl.DateTimeFormat("ru-RU", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit", ...options }).format(new Date(value));
+      }
+      function formatMonth(key) {
+        const [year, month] = key.split("-").map(Number);
+        return new Intl.DateTimeFormat("ru-RU", { month: "long", year: "numeric" }).format(new Date(year, month - 1, 1));
+      }
+      function formatMoney(amount, currency) {
+        const number = Number(amount);
+        const fraction = Number.isFinite(number) && number % 1 !== 0;
+        const formatted = new Intl.NumberFormat("ru-RU", { maximumFractionDigits: 2, minimumFractionDigits: fraction ? 2 : 0 }).format(number);
+        return `${formatted} ${CURRENCIES[currency] || currency}`;
+      }
+      function formatMeasure(value, unit) {
+        if (value === null || value === undefined || value === "") return "";
+        const parsed = Number(value);
+        if (!Number.isFinite(parsed)) return "";
+        return `${new Intl.NumberFormat("ru-RU", { maximumFractionDigits: 2 }).format(parsed)} ${unit}`;
+      }
+      function formatStatus(status) { return STATUS[status] || "Статус не указан"; }
+      function statusElement(status) {
+        const node = document.createElement("span");
+        node.className = `status-badge ${status}`;
+        node.textContent = formatStatus(status);
+        return node;
+      }
+      function orderBelongsToUser(order) {
+        if (!profile) return false;
+        return profile.role === "customer" ? order.ownerId === profile.id : order.assignedCarrierId === profile.id;
+      }
+      function visibleOrders() { return orders.filter(orderBelongsToUser); }
+      function isAvailableMode() { return profile?.role === "carrier" && currentState.orderMode === "available"; }
+      function listingOrders() { return isAvailableMode() ? orders.filter(order => order.status === "searching") : visibleOrders(); }
+      function ordersForFilter() {
+        const all = listingOrders();
+        if (selectedFilter === "active") return all.filter(order => ACTIVE.has(order.status));
+        if (selectedFilter === "waiting") return all.filter(order => order.status === "searching");
+        if (selectedFilter === "completed") return all.filter(order => order.status === "delivered");
+        return all.filter(order => order.status === "cancelled");
+      }
+      function setError(input, message, errorId) {
+        const error = document.getElementById(errorId);
+        input.setAttribute("aria-invalid", message ? "true" : "false");
+        error.textContent = message;
+      }
+      function clearErrors(form) {
+        $$("[aria-invalid]", form).forEach(input => input.setAttribute("aria-invalid", "false"));
+        $$(".field-error", form).forEach(error => { error.textContent = ""; });
+        $(".form-error-summary", form)?.replaceChildren();
+      }
+      function notify(message) {
+        const toast = $("#toast");
+        toast.textContent = message;
+        toast.classList.remove("hidden");
+        window.clearTimeout(toastTimer);
+        toastTimer = window.setTimeout(() => toast.classList.add("hidden"), 2600);
+      }
+      function currentScreen() {
+        const base = currentState.view === "photos" ? currentState.backgroundView : currentState.view;
+        return screens[base] || null;
+      }
+      function saveScroll() {
+        const screen = currentScreen();
+        if (!screen) return;
+        screenScroll[currentState.view === "photos" ? currentState.backgroundView : currentState.view] = screen.scrollTop;
+        if (history.state) history.replaceState({ ...history.state, scrollTop: screen.scrollTop }, "", location.href);
+      }
+      function setHash(state) {
+        if (state.view === "detail") return `#order-${encodeURIComponent(state.orderId)}`;
+        if (state.view === "photos") return "#photos";
+        if (state.view === "orders" && state.orderMode === "available") return "#offers";
+        return `#${state.view}`;
+      }
+      function navigate(state, options = {}) {
+        const { push = true, focus = true } = options;
+        if (push) {
+          saveScroll();
+          const baseView = state.view === "photos" ? state.backgroundView : state.view;
+          const next = { ...state, profileId: profile?.id, scrollTop: state.scrollTop ?? screenScroll[baseView] ?? 0 };
+          history.pushState(next, "", setHash(next));
+        }
+        renderRoute(push ? history.state : state, { focus, restore: false });
+      }
+      function goBack(fallback = "orders") {
+        if (history.state && history.state.view !== "auth") history.back();
+        else navigate({ view: fallback, scrollTop: screenScroll[fallback] || 0 });
+      }
+      function setNavigation(view) {
+        const base = view === "photos" ? currentState.backgroundView : view;
+        const active = ["orders", "detail"].includes(base) ? (isAvailableMode() ? "create" : "orders") : base;
+        $$(".nav-btn").forEach(button => {
+          const selected = button.dataset.nav === active;
+          button.classList.toggle("active", selected);
+          if (selected) button.setAttribute("aria-current", "page"); else button.removeAttribute("aria-current");
+        });
+      }
+      function focusHeading(view) {
+        const heading = $("h1[tabindex='-1']", screens[view] || document);
+        if (heading) heading.focus({ preventScroll: true });
+      }
+      function renderRoute(state, options = {}) {
+        const { focus = false, restore = false } = options;
+        if (!state || !state.view) state = { view: "auth", scrollTop: 0 };
+        const wasPhotos = currentState.view === "photos";
+        currentState = state;
+        const auth = $("#authScreen");
+        const app = $("#app");
+        const viewer = $("#photoViewer");
+        if (state.view === "auth") {
+          auth.classList.remove("hidden");
+          app.classList.add("hidden");
+          app.inert = true;
+          viewer.classList.add("hidden");
+          viewer.setAttribute("aria-hidden", "true");
+          return;
+        }
+        auth.classList.add("hidden");
+        app.classList.remove("hidden");
+        const baseView = state.view === "photos" ? state.backgroundView : state.view;
+        Object.entries(screens).forEach(([key, element]) => element.classList.toggle("hidden", key !== baseView));
+        $("#roleLabel").textContent = profile?.role === "carrier" ? "Перевозчик" : "Заказчик";
+        const isPhotos = state.view === "photos";
+        app.inert = isPhotos;
+        viewer.classList.toggle("hidden", !isPhotos);
+        viewer.setAttribute("aria-hidden", String(!isPhotos));
+        if (isPhotos) renderGallery();
+        setNavigation(state.view);
+        if (baseView === "home") renderHome();
+        if (baseView === "orders") renderOrders();
+        if (baseView === "detail") renderDetail(state.orderId);
+        if (baseView === "profile") renderProfile();
+        const screen = screens[baseView];
+        if (screen) {
+          const wantedScroll = restore ? Number(state.scrollTop || 0) : Number(state.scrollTop ?? screenScroll[baseView] ?? 0);
+          screen.scrollTop = wantedScroll;
+          screenScroll[baseView] = wantedScroll;
+        }
+        if (wasPhotos && !isPhotos && viewerReturnElement?.isConnected) {
+          viewerReturnElement.focus({ preventScroll: true });
+          viewerReturnElement = null;
+        } else if (focus && !isPhotos) focusHeading(baseView);
+      }
+      function resetLocalPhotos() {
+        [...profilePhotos, ...vehiclePhotos].forEach(photo => { if (photo.src.startsWith("blob:")) URL.revokeObjectURL(photo.src); });
+        profilePhotos.splice(0, profilePhotos.length, { id: "portrait", src: "assets/profile-portrait.webp", alt: "Портрет профиля" });
+        vehiclePhotos.splice(0, vehiclePhotos.length, { id: "truck", src: "assets/vehicle-truck.webp", alt: "Грузовой автомобиль" });
+      }
+      function startSession(nextProfile) {
+        resetLocalPhotos();
+        profile = nextProfile;
+        selectedFilter = "active";
+        selectedMonth = "all";
+        $("#createNav span").textContent = profile.role === "carrier" ? "Найти" : "Создать";
+        $("#homeActionText").textContent = profile.role === "carrier" ? "Найти заказ" : "Создать заказ";
+        $("#activeHeading").textContent = profile.role === "carrier" ? "Мои рейсы" : "Активные заказы";
+        $("#ordersHeading").textContent = profile.role === "carrier" ? "Доступные заказы" : "Мои заказы";
+        history.replaceState({ view: "home", scrollTop: 0, profileId: profile.id }, "", "#home");
+        currentState = { view: "auth", scrollTop: 0 };
+        navigate({ view: "home", scrollTop: 0 }, { push: false, focus: true });
+      }
+      function switchAuth(mode) {
+        const registering = mode === "register";
+        $("#loginForm").classList.toggle("hidden", registering);
+        $("#registerForm").classList.toggle("hidden", !registering);
+        $("#loginTab").setAttribute("aria-pressed", String(!registering));
+        $("#registerTab").setAttribute("aria-pressed", String(registering));
+        $("#loginTab").setAttribute("aria-selected", String(!registering));
+        $("#registerTab").setAttribute("aria-selected", String(registering));
+        $("#authTitle").textContent = registering ? "Регистрация" : "Вход";
+        $("#authDescription").textContent = registering ? "Создайте профиль для работы в кабинете на этом устройстве." : "Войдите в локальный кабинет или зарегистрируйте профиль на этом устройстве.";
+      }
+      function renderHome() {
+        if (!profile) return;
+        const firstName = String(profile.name || "Алексей").trim().split(/\s+/)[0] || "Алексей";
+        $("#greetingName").textContent = firstName;
+        const active = visibleOrders().filter(order => ACTIVE.has(order.status)).slice().sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        const list = $("#homeActiveList");
+        list.replaceChildren();
+        if (!active.length) {
+          const empty = document.createElement("p"); empty.className = "empty-state";
+          empty.textContent = profile.role === "carrier" ? "У вас пока нет назначенных рейсов. Найдите заказ, который подходит вашему транспорту." : "Активных заказов пока нет.";
+          list.append(empty);
+        } else {
+          active.slice(0, 3).forEach((order, index) => {
+            const button = document.createElement("button"); button.type = "button"; button.className = "manifest-item"; button.dataset.orderId = order.id; button.setAttribute("aria-label", `Открыть заказ ${order.id}: ${order.origin} → ${order.destination}`);
+            const number = document.createElement("span"); number.className = "manifest-index"; number.textContent = String(index + 1).padStart(2, "0");
+            const content = document.createElement("span"); content.className = "manifest-main";
+            const route = document.createElement("span"); route.className = "manifest-route"; route.textContent = `${order.origin} → ${order.destination}`;
+            const meta = document.createElement("span"); meta.className = "manifest-meta"; meta.textContent = [order.cargo, formatMeasure(order.weight, "т"), order.cmrRequired ? "Нужен CMR" : ""].filter(Boolean).join(" · ");
+            content.append(route, meta, statusElement(order.status)); button.append(number, content); list.append(button);
+          });
+        }
+        renderReport();
+      }
+      function periodBuckets(range) {
+        const now = new Date();
+        if (range === "month") return Array.from({ length: 6 }, (_, index) => {
+          const date = new Date(now.getFullYear(), now.getMonth() - (5 - index), 1);
+          const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
+          const current = index === 5;
+          return { key, label: new Intl.DateTimeFormat("ru-RU", { month: "short" }).format(date).replace(".", ""), current, title: `${formatMonth(key)}${current ? ", текущий неполный месяц" : ""}` };
+        });
+        if (range === "quarter") {
+          const currentQuarter = Math.floor(now.getMonth() / 3);
+          return Array.from({ length: 4 }, (_, index) => {
+            const offset = 3 - index;
+            const date = new Date(now.getFullYear(), currentQuarter * 3 - offset * 3, 1);
+            const quarter = Math.floor(date.getMonth() / 3) + 1;
+            const current = index === 3;
+            return { key: `${date.getFullYear()}-Q${quarter}`, label: `${quarter} кв.`, current, title: `${quarter} квартал ${date.getFullYear()}${current ? ", текущий неполный квартал" : ""}` };
+          });
+        }
+        return Array.from({ length: 3 }, (_, index) => {
+          const year = now.getFullYear() - 2 + index;
+          const current = index === 2;
+          return { key: String(year), label: String(year), current, title: `${year} год${current ? ", текущий неполный год" : ""}` };
+        });
+      }
+      function orderInPeriod(order, range, key) {
+        const date = new Date(order.createdAt);
+        if (range === "month") return localDateKey(order.createdAt) === key;
+        if (range === "quarter") return `${date.getFullYear()}-Q${Math.floor(date.getMonth() / 3) + 1}` === key;
+        return String(date.getFullYear()) === key;
+      }
+      function renderReport() {
+        const all = visibleOrders();
+        const buckets = periodBuckets(reportRange);
+        const counts = buckets.map(bucket => all.filter(order => orderInPeriod(order, reportRange, bucket.key)).length);
+        const activeCount = all.filter(order => ACTIVE.has(order.status) && buckets.some(bucket => orderInPeriod(order, reportRange, bucket.key))).length;
+        const deliveredCount = all.filter(order => order.status === "delivered" && buckets.some(bucket => orderInPeriod(order, reportRange, bucket.key))).length;
+        $("#metricOrders").textContent = String(counts.reduce((sum, value) => sum + value, 0));
+        $("#metricActive").textContent = String(activeCount);
+        $("#metricDelivered").textContent = String(deliveredCount);
+        const labels = { month: "месяцам", quarter: "кварталам", year: "годам" };
+        $("#reportHeading").textContent = `Заказы по ${labels[reportRange]}`;
+        $("#chartTitle").textContent = `Заказы по ${labels[reportRange]}`;
+        $("#chartNote").textContent = buckets.some(bucket => bucket.current) ? "Последний столбец показывает текущий неполный период." : "";
+        const chart = $("#reportChart"); chart.replaceChildren();
+        chart.style.gridTemplateColumns = `repeat(${buckets.length}, minmax(0, 1fr))`;
+        const max = Math.max(1, ...counts);
+        buckets.forEach((bucket, index) => {
+          const item = document.createElement("div"); item.className = "bar-item"; item.setAttribute("aria-label", `${bucket.title}: ${counts[index]} заказов`);
+          const value = document.createElement("span"); value.className = "bar-value"; value.textContent = String(counts[index]);
+          const track = document.createElement("span"); track.className = "bar-track";
+          const fill = document.createElement("span"); fill.className = "bar-fill"; fill.style.height = counts[index] ? `${Math.max(8, counts[index] / max * 70)}px` : "0"; track.append(fill);
+          const label = document.createElement("span"); label.className = "bar-label"; label.textContent = bucket.label; label.title = bucket.title;
+          item.append(value, track, label); chart.append(item);
+        });
+        $$(".period-option").forEach(button => button.setAttribute("aria-pressed", String(button.dataset.range === reportRange)));
+      }
+      function updateFilterCounts() {
+        const all = listingOrders();
+        const counts = {
+          active: all.filter(order => ACTIVE.has(order.status)).length,
+          waiting: all.filter(order => order.status === "searching").length,
+          completed: all.filter(order => order.status === "delivered").length,
+          cancelled: all.filter(order => order.status === "cancelled").length
+        };
+        Object.entries(counts).forEach(([key, value]) => { $(`[data-count="${key}"]`).textContent = String(value); });
+      }
+      function renderMonthOptions() {
+        const select = $("#monthFilter");
+        const months = [...new Set(listingOrders().map(order => localDateKey(order.createdAt)))].sort().reverse();
+        const options = [new Option("Все месяцы", "all"), ...months.map(key => new Option(formatMonth(key), key))];
+        select.replaceChildren(...options);
+        if (selectedMonth !== "all" && !months.includes(selectedMonth)) selectedMonth = "all";
+        select.value = selectedMonth;
+      }
+      function buildOrderButton(order) {
+        const button = document.createElement("button"); button.type = "button"; button.className = "order-item"; button.dataset.orderId = order.id;
+        button.setAttribute("aria-label", `Открыть заказ ${order.id}: ${order.origin} → ${order.destination}`);
+        const route = document.createElement("span"); route.className = "order-route"; route.textContent = `${order.origin} → ${order.destination}`;
+        const meta = document.createElement("span"); meta.className = "order-meta";
+        const id = document.createElement("span"); id.textContent = `№ ${order.id}`;
+        const details = document.createElement("span"); details.textContent = [formatMeasure(order.weight, "т"), order.cargo, order.cmrRequired ? "Нужен CMR" : ""].filter(Boolean).join(" · ");
+        meta.append(id, details, statusElement(order.status));
+        const price = document.createElement("span"); price.className = "order-price"; price.textContent = formatMoney(order.amount, order.currency);
+        button.append(route, meta, price); return button;
+      }
+      function renderOrders() {
+        if (!profile) return;
+        $("#ordersHeading").textContent = profile.role === "carrier" ? (isAvailableMode() ? "Доступные заказы" : "Мои рейсы") : "Мои заказы";
+        $("#ordersScreen .filter-grid").classList.toggle("hidden", isAvailableMode());
+        if (isAvailableMode()) selectedFilter = "waiting";
+        updateFilterCounts(); renderMonthOptions();
+        const list = $("#ordersList"); list.replaceChildren();
+        const filtered = ordersForFilter().filter(order => selectedMonth === "all" || localDateKey(order.createdAt) === selectedMonth).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        if (!filtered.length) {
+          const empty = document.createElement("p"); empty.className = "empty-state";
+          empty.textContent = profile.role === "carrier" && selectedFilter === "waiting" ? "Нет доступных заказов за выбранный месяц." : "В этой вкладке пока нет заказов.";
+          list.append(empty);
+        } else {
+          const groups = new Map();
+          filtered.forEach(order => { const key = localDateKey(order.createdAt); if (!groups.has(key)) groups.set(key, []); groups.get(key).push(order); });
+          groups.forEach((items, key) => {
+            const heading = document.createElement("h2"); heading.className = "order-group-title"; heading.textContent = formatMonth(key); list.append(heading);
+            items.forEach(order => list.append(buildOrderButton(order)));
+          });
+        }
+        $$(".filter-button").forEach(button => button.setAttribute("aria-pressed", String(button.dataset.filter === selectedFilter)));
+      }
+      function addDataItem(container, label, value) {
+        const item = document.createElement("div"); item.className = "data-item";
+        const title = document.createElement("span"); title.className = "data-label"; title.textContent = label;
+        const content = document.createElement("span"); content.className = "data-value"; content.textContent = value || "—";
+        item.append(title, content); container.append(item);
+      }
+      function stageValue(value, missingLabel) { return value ? formatDate(value) : missingLabel; }
+      function renderDetail(orderId) {
+        const order = orders.find(item => item.id === orderId);
+        if (!order) { $("#detailHeading").textContent = "Заказ не найден"; return; }
+        $("#detailHeading").textContent = `Заказ ${order.id}`;
+        $("#detailRoute").textContent = `${order.origin} → ${order.destination}`;
+        $("#detailSummary").textContent = [order.cargo, formatMeasure(order.weight, "т"), formatMeasure(order.volume, "м³"), order.vehicle].filter(Boolean).join(" · ");
+        const status = $("#detailStatus"); status.className = `status-badge ${order.status}`; status.textContent = formatStatus(order.status);
+        $("#schemeOrigin").textContent = order.origin; $("#schemeDestination").textContent = order.destination;
+        const mapLink = $("#mapLink"); const notice = $("#mapNotice");
+        if (order.coordinates) {
+          const [a, b] = order.coordinates;
+          mapLink.href = `https://2gis.ru/directions/tab/truck/points/${a[0]},${a[1]}|${b[0]},${b[1]}`;
+          mapLink.classList.remove("hidden"); notice.textContent = "Схема показывает только точки А и Б. Расчёт дороги и геопозиция не подключены.";
+        } else {
+          mapLink.removeAttribute("href"); mapLink.classList.add("hidden"); notice.textContent = "Координаты этого заказа не заданы. Ссылка на маршрут в 2ГИС недоступна.";
+        }
+        $("#loadingTime").textContent = stageValue(order.loadingAt, order.status === "searching" ? "Ожидает перевозчика" : order.status === "assigned" ? "Не начата" : "—");
+        $("#departedTime").textContent = stageValue(order.departedAt, "—");
+        $("#deliveredTime").textContent = stageValue(order.deliveredAt, "—");
+        const data = $("#detailData"); data.replaceChildren();
+        addDataItem(data, "Сумма", formatMoney(order.amount, order.currency));
+        addDataItem(data, "Создан", formatDate(order.createdAt));
+        addDataItem(data, "Плановая погрузка", order.plannedLoadingDate ? new Intl.DateTimeFormat("ru-RU", { day: "numeric", month: "long", year: "numeric" }).format(new Date(`${order.plannedLoadingDate}T12:00:00`)) : "—");
+        addDataItem(data, "Комментарий", order.comment || "—");
+        if (order.assignedAt) addDataItem(data, "Принят перевозчиком", formatDate(order.assignedAt));
+        if (order.cancelledAt) addDataItem(data, "Отменён", formatDate(order.cancelledAt));
+        const actionArea = $("#detailActionArea"); actionArea.replaceChildren();
+        const canAct = profile?.role === "carrier" && (order.status === "searching" || order.assignedCarrierId === profile.id);
+        if (canAct) {
+          const labels = { searching: "Принять заказ", assigned: "Начать погрузку", loading: "Отправиться", in_transit: "Отметить доставку" };
+          const next = { searching: "assigned", assigned: "loading", loading: "in_transit", in_transit: "delivered" }[order.status];
+          if (next) {
+            const button = document.createElement("button"); button.type = "button"; button.className = "primary-action detail-action"; button.id = "advanceOrder";
+            const text = document.createElement("span"); text.textContent = labels[order.status];
+            const icon = document.createElement("span"); icon.setAttribute("aria-hidden", "true"); icon.textContent = "→";
+            button.append(text, icon); button.addEventListener("click", () => advanceOrder(order, next)); actionArea.append(button);
+          }
+        }
+        const documentState = $("#documentState");
+        documentState.textContent = order.document ? `Файл добавлен: ${order.document.name}` : order.cmrRequired ? "Нужен CMR · файл не добавлен" : "Файл не добавлен";
+        const canEditFiles = orderBelongsToUser(order);
+        const docInput = $("#documentInput"); docInput.value = "";
+        docInput.disabled = !canEditFiles;
+        docInput.closest(".file-button").classList.toggle("hidden", !canEditFiles);
+        docInput.onchange = () => {
+          if (!orderBelongsToUser(order)) return;
+          const file = docInput.files?.[0]; if (!file) return;
+          order.document = { name: file.name, size: file.size };
+          documentState.textContent = `Файл добавлен: ${file.name}`;
+          notify("Файл добавлен на этом устройстве");
+        };
+        $("#cargoPhotoCount").textContent = `${order.photos.length} фото`;
+        $("#cargoPhotoState").textContent = order.photos.length ? `${order.photos.length} ${plural(order.photos.length, "фотография", "фотографии", "фотографий")} на этом устройстве` : "Фотографии не добавлены";
+        const openPhotos = $("#openCargoPhotos"); openPhotos.classList.toggle("hidden", order.photos.length === 0);
+        openPhotos.onclick = () => openGallery(`Фото груза, заказ ${order.id}`, order.photos, openPhotos);
+        const photoInput = $("#cargoPhotoInput"); photoInput.value = "";
+        photoInput.disabled = !canEditFiles;
+        photoInput.closest(".file-button").classList.toggle("hidden", !canEditFiles);
+        photoInput.onchange = () => {
+          if (!orderBelongsToUser(order)) return;
+          const files = [...(photoInput.files || [])];
+          appendImageFiles(order.photos, files, "Фото груза");
+          renderDetail(order.id);
+        };
+      }
+      function advanceOrder(order, nextStatus) {
+        const now = new Date().toISOString();
+        if (nextStatus === "assigned") { order.assignedCarrierId = profile.id; order.assignedAt = now; }
+        if (nextStatus === "loading") order.loadingAt = now;
+        if (nextStatus === "in_transit") order.departedAt = now;
+        if (nextStatus === "delivered") order.deliveredAt = now;
+        order.status = nextStatus;
+        renderHome(); renderOrders(); renderDetail(order.id);
+        notify(`Статус заказа: ${formatStatus(nextStatus)}`);
+      }
+      function renderProfile() {
+        if (!profile) return;
+        $("#profileName").textContent = profile.name;
+        $("#profileRole").textContent = profile.role === "carrier" ? "Перевозчик" : "Заказчик";
+        $("#profilePhone").textContent = profile.phone;
+        $("#profileEmail").textContent = profile.email;
+        $("#profileImage").src = profilePhotos[0]?.src || "";
+        $("#profileImage").alt = profilePhotos[0]?.alt || "Фото профиля";
+        $("#profilePhotoCount").textContent = `${profilePhotos.length} ${plural(profilePhotos.length, "фото", "фото", "фото")}`;
+        const vehicle = profile.role === "carrier";
+        $("#vehicleSection").classList.toggle("hidden", !vehicle);
+        if (vehicle) {
+          $("#vehicleImage").src = vehiclePhotos[0]?.src || "";
+          $("#vehicleImage").alt = vehiclePhotos[0]?.alt || "Фото транспорта";
+          $("#vehiclePhotoCount").textContent = `${vehiclePhotos.length} фото`;
+        }
+      }
+      function plural(count, one, few, many) {
+        const mod100 = count % 100;
+        if (mod100 >= 11 && mod100 <= 14) return many;
+        const mod10 = count % 10;
+        return mod10 === 1 ? one : mod10 >= 2 && mod10 <= 4 ? few : many;
+      }
+      function appendImageFiles(target, files, prefix) {
+        const valid = files.filter(file => file.type.startsWith("image/"));
+        if (!valid.length) { if (files.length) notify("Выберите файл изображения"); return; }
+        target.unshift(...valid.map((file, index) => ({ id: `${Date.now()}-${index}-${Math.random()}`, src: URL.createObjectURL(file), alt: file.name || prefix, name: file.name || prefix })));
+        notify(`Добавлено файлов: ${valid.length}`);
+      }
+      function openGallery(title, photos, trigger) {
+        if (!photos.length) return;
+        window.clearTimeout(toastTimer);
+        $("#toast").classList.add("hidden");
+        currentGallery = photos.slice(); galleryIndex = 0; viewerReturnElement = trigger;
+        $("#photoViewer").setAttribute("aria-label", title);
+        navigate({ view: "photos", orderId: currentState.orderId, orderMode: currentState.orderMode, backgroundView: currentState.view === "photos" ? currentState.backgroundView : currentState.view, scrollTop: currentScreen()?.scrollTop || 0 });
+        $("#closeViewer").focus({ preventScroll: true });
+      }
+      function renderGallery() {
+        if (!currentGallery.length) return;
+        const photo = currentGallery[galleryIndex];
+        const image = $("#viewerImage"); const fallback = $("#viewerFallback");
+        fallback.classList.add("hidden"); image.classList.remove("hidden"); image.alt = photo.alt || "Фотография"; image.src = photo.src;
+        image.onerror = () => { image.classList.add("hidden"); fallback.textContent = `Не удалось открыть файл: ${photo.name || photo.alt || "фотография"}`; fallback.classList.remove("hidden"); };
+        $("#photoCounter").textContent = `${galleryIndex + 1} из ${currentGallery.length}`;
+        $("#previousPhoto").disabled = currentGallery.length < 2; $("#nextPhoto").disabled = currentGallery.length < 2;
+        const rail = $("#thumbnailRail"); rail.replaceChildren();
+        currentGallery.forEach((item, index) => {
+          const button = document.createElement("button"); button.type = "button"; button.className = "thumbnail"; button.setAttribute("aria-label", `Фото ${index + 1} из ${currentGallery.length}`); button.setAttribute("aria-current", String(index === galleryIndex)); button.addEventListener("click", () => { galleryIndex = index; renderGallery(); });
+          const thumb = document.createElement("img"); thumb.src = item.src; thumb.alt = ""; thumb.onerror = () => { thumb.hidden = true; };
+          button.append(thumb); rail.append(button);
+        });
+        const currentThumb = $(".thumbnail[aria-current='true']", rail); currentThumb?.scrollIntoView({ block: "nearest", inline: "nearest" });
+      }
+      function moveGallery(step) {
+        if (currentGallery.length < 2) return;
+        galleryIndex = (galleryIndex + step + currentGallery.length) % currentGallery.length;
+        renderGallery();
+      }
+      function closeGallery() {
+        if (currentState.view === "photos") goBack(currentState.backgroundView || "profile");
+      }
+      function parseDecimal(value) {
+        const normalized = String(value || "").trim().replace(/[\s\u00a0\u202f]/g, "");
+        if (!/^\d{1,12}(?:[,.]\d{1,2})?$/.test(normalized)) return null;
+        const number = Number(normalized.replace(",", "."));
+        return Number.isFinite(number) && number > 0 ? number : null;
+      }
+      function validateCreate() {
+        const origin = $("#origin"); const destination = $("#destination"); const amount = $("#amount");
+        const weight = $("#weight"); const volume = $("#volume");
+        const originValue = origin.value.trim(); const destinationValue = destination.value.trim();
+        const money = parseDecimal(amount.value);
+        const weightValue = weight.value.trim() ? parseDecimal(weight.value) : null;
+        const volumeValue = volume.value.trim() ? parseDecimal(volume.value) : null;
+        setError(origin, originValue ? "" : "Укажите пункт отправления.", "originError");
+        setError(destination, destinationValue ? "" : "Укажите пункт назначения.", "destinationError");
+        setError(amount, money === null ? "Укажите сумму больше нуля: до 12 цифр и двух знаков после запятой." : "", "amountError");
+        setError(weight, weight.value.trim() && weightValue === null ? "Введите вес больше нуля, максимум два знака после запятой." : "", "weightError");
+        setError(volume, volume.value.trim() && volumeValue === null ? "Введите объём больше нуля, максимум два знака после запятой." : "", "volumeError");
+        const valid = Boolean(originValue && destinationValue && money !== null && (!weight.value.trim() || weightValue !== null) && (!volume.value.trim() || volumeValue !== null));
+        $("#createSummary").textContent = valid ? "" : "Исправьте поля с ошибками перед публикацией.";
+        if (!valid) {
+          const first = $("[aria-invalid='true']", $("#createForm")); first?.focus({ preventScroll: false });
+        }
+        return { valid, originValue, destinationValue, money };
+      }
+      function clearCreateErrorsOnInput(event) {
+        if (event.target.matches("#origin") && event.target.value.trim()) setError(event.target, "", "originError");
+        if (event.target.matches("#destination") && event.target.value.trim()) setError(event.target, "", "destinationError");
+        if (event.target.matches("#amount")) {
+          const parsed = parseDecimal(event.target.value);
+          if (parsed !== null) setError(event.target, "", "amountError");
+        }
+        if (event.target.matches("#weight, #volume") && !event.target.value.trim()) setError(event.target, "", event.target.id === "weight" ? "weightError" : "volumeError");
+        if (event.target.matches("#weight, #volume") && event.target.value.trim() && parseDecimal(event.target.value) !== null) setError(event.target, "", event.target.id === "weight" ? "weightError" : "volumeError");
+        if (!$("[aria-invalid='true']", $("#createForm"))) $("#createSummary").textContent = "";
+      }
+      function publishOrder(event) {
+        event.preventDefault();
+        const result = validateCreate();
+        if (!result.valid) return;
+        const weight = $("#weight").value.trim() ? parseDecimal($("#weight").value) : null;
+        const volume = $("#volume").value.trim() ? parseDecimal($("#volume").value) : null;
+        const created = new Date();
+        const id = `KZ-${createdCounter++}`;
+        const order = {
+          id, ownerId: profile.id, assignedCarrierId: null,
+          origin: result.originValue, destination: result.destinationValue, cargo: selectedCargo,
+          weight, volume, vehicle: $("#vehicleType").value, amount: result.money, currency: $("#currency").value,
+          status: "searching", createdAt: created.toISOString(), assignedAt: null, loadingAt: null, departedAt: null, deliveredAt: null, cancelledAt: null,
+          cmrRequired: $("#cmrRequired").value === "yes", plannedLoadingDate: $("#loadingDate").value,
+          comment: $("#comment").value.trim(), document: null, photos: [], coordinates: coordinatesFor(result.originValue, result.destinationValue)
+        };
+        orders.unshift(order);
+        $("#createForm").reset(); selectedCargo = "Паллеты";
+        $$("#cargoChoices .choice").forEach(button => button.setAttribute("aria-pressed", String(button.dataset.cargo === selectedCargo)));
+        clearErrors($("#createForm"));
+        selectedFilter = "waiting"; selectedMonth = "all";
+        renderOrders();
+        navigate({ view: "orders", scrollTop: 0 });
+        notify(`Заказ ${order.id} добавлен в ожидание`);
+      }
+      function login(event) {
+        event.preventDefault(); clearErrors($("#loginForm"));
+        const phone = $("#loginPhone"); const code = $("#loginCode");
+        const phoneError = isPhoneValid(phone.value) ? "" : "Введите номер телефона с кодом страны.";
+        const codeError = code.value.trim() ? "" : "Введите код доступа.";
+        setError(phone, phoneError, "loginPhoneError"); setError(code, codeError, "loginCodeError");
+        $("#loginSummary").textContent = "";
+        if (phoneError || codeError) { (phoneError ? phone : code).focus(); return; }
+        const digits = normalizePhone(phone.value);
+        const found = users.find(user => normalizePhone(user.phone) === digits);
+        if (found) { startSession(found); return; }
+        if (digits === normalizePhone("+7 777 123 45 67")) {
+          startSession({ id: "customer-seed", name: "Алексей Иманов", phone: "+7 777 123 45 67", email: "alexey@example.com", role: "customer" }); return;
+        }
+        $("#loginSummary").textContent = "Профиль с этим номером не найден на устройстве. Зарегистрируйтесь.";
+      }
+      function register(event) {
+        event.preventDefault(); clearErrors($("#registerForm"));
+        const name = $("#registerName"); const phone = $("#registerPhone"); const email = $("#registerEmail");
+        const nameError = name.value.trim().length >= 2 ? "" : "Введите имя и фамилию.";
+        const phoneError = isPhoneValid(phone.value) ? "" : "Введите номер телефона с кодом страны.";
+        const emailError = email.validity.valid && email.value.trim() ? "" : "Введите действующий email.";
+        setError(name, nameError, "registerNameError"); setError(phone, phoneError, "registerPhoneError"); setError(email, emailError, "registerEmailError");
+        $("#registerSummary").textContent = nameError || phoneError || emailError ? "Исправьте поля с ошибками перед регистрацией." : "";
+        if (nameError || phoneError || emailError) { (nameError ? name : phoneError ? phone : email).focus(); return; }
+        if (normalizePhone(phone.value) === "77771234567" || users.some(user => normalizePhone(user.phone) === normalizePhone(phone.value))) {
+          $("#registerPhoneError").textContent = "Этот номер уже зарегистрирован в текущей вкладке.";
+          phone.setAttribute("aria-invalid", "true"); phone.focus(); return;
+        }
+        const user = { id: `user-${Date.now()}`, name: name.value.trim(), phone: phone.value.trim(), email: email.value.trim(), role: selectedRegisterRole };
+        users.push(user); startSession(user);
+      }
+      function updateRegisterRole(role) {
+        selectedRegisterRole = role;
+        $$('[data-register-role]').forEach(button => button.setAttribute("aria-pressed", String(button.dataset.registerRole === role)));
+      }
+      function openOrderFromTarget(event) {
+        const button = event.target.closest("[data-order-id]");
+        if (!button) return;
+        const order = orders.find(item => item.id === button.dataset.orderId);
+        if (order) navigate({ view: "detail", orderId: order.id, orderMode: currentState.orderMode, scrollTop: 0 });
+      }
+      function chooseHomeAction() { navTo("create"); }
+      function navTo(view) {
+        if (view === "create" && profile.role === "carrier") {
+          selectedFilter = "waiting"; selectedMonth = "all";
+          navigate({ view: "orders", orderMode: "available", scrollTop: 0 }); return;
+        }
+        if (view === "orders" && profile.role === "carrier") selectedFilter = "active";
+        navigate({ view, orderMode: "mine", scrollTop: screenScroll[view] || 0 });
+      }
+      function bindImageFallbacks() {
+        $$("img").forEach(image => {
+          image.addEventListener("error", () => {
+            if (image.id === "viewerImage") return;
+            image.hidden = true;
+          });
+        });
+      }
+
+      $("#loginTab").addEventListener("click", () => switchAuth("login"));
+      $("#registerTab").addEventListener("click", () => switchAuth("register"));
+      $("#loginForm").addEventListener("submit", login);
+      $("#registerForm").addEventListener("submit", register);
+      $$('[data-register-role]').forEach(button => button.addEventListener("click", () => updateRegisterRole(button.dataset.registerRole)));
+      $("#createForm").addEventListener("submit", publishOrder);
+      $("#createForm").addEventListener("input", clearCreateErrorsOnInput);
+      $$("#cargoChoices .choice").forEach(button => button.addEventListener("click", () => {
+        selectedCargo = button.dataset.cargo;
+        $$("#cargoChoices .choice").forEach(choice => choice.setAttribute("aria-pressed", String(choice === button)));
+      }));
+      $("#homeAction").addEventListener("click", chooseHomeAction);
+      $("#allOrdersButton").addEventListener("click", () => navTo("orders"));
+      $("#homeActiveList").addEventListener("click", openOrderFromTarget);
+      $("#ordersList").addEventListener("click", openOrderFromTarget);
+      $$(".filter-button").forEach(button => button.addEventListener("click", () => { selectedFilter = button.dataset.filter; renderOrders(); }));
+      $("#monthFilter").addEventListener("change", event => { selectedMonth = event.target.value; renderOrders(); });
+      $$(".period-option").forEach(button => button.addEventListener("click", () => { reportRange = button.dataset.range; renderReport(); }));
+      $$("[data-nav]").forEach(button => button.addEventListener("click", () => navTo(button.dataset.nav)));
+      $$("[data-back]").forEach(button => button.addEventListener("click", () => goBack("orders")));
+      $("#logoutButton").addEventListener("click", () => {
+        resetLocalPhotos();
+        profile = null; currentState = { view: "auth", scrollTop: 0 };
+        history.replaceState(currentState, "", "#auth");
+        $("#app").classList.add("hidden"); $("#app").inert = true; $("#authScreen").classList.remove("hidden"); switchAuth("login");
+        $("#loginCode").value = ""; $("#loginSummary").textContent = ""; $("#loginPhone").focus({ preventScroll: true });
+      });
+      $("#openProfilePhotos").addEventListener("click", event => openGallery("Фото профиля", profilePhotos, event.currentTarget));
+      $("#openVehiclePhotos").addEventListener("click", event => openGallery("Фото транспорта", vehiclePhotos, event.currentTarget));
+      $("#profilePhotoInput").addEventListener("change", event => { appendImageFiles(profilePhotos, [...(event.target.files || [])], "Фото профиля"); event.target.value = ""; renderProfile(); });
+      $("#vehiclePhotoInput").addEventListener("change", event => { appendImageFiles(vehiclePhotos, [...(event.target.files || [])], "Фото транспорта"); event.target.value = ""; renderProfile(); });
+      $("#closeViewer").addEventListener("click", closeGallery);
+      $("#previousPhoto").addEventListener("click", () => moveGallery(-1));
+      $("#nextPhoto").addEventListener("click", () => moveGallery(1));
+      window.addEventListener("popstate", event => {
+        if (!profile && event.state?.view !== "auth") {
+          history.replaceState({ view: "auth", scrollTop: 0 }, "", "#auth");
+          renderRoute({ view: "auth", scrollTop: 0 });
+        } else if (profile && event.state?.profileId && event.state.profileId !== profile.id) {
+          const home = { view: "home", scrollTop: 0, profileId: profile.id };
+          history.replaceState(home, "", "#home"); renderRoute(home, { focus: true });
+        } else if (event.state?.view) renderRoute(event.state, { focus: false, restore: true });
+        else renderRoute({ view: "auth", scrollTop: 0 });
+      });
+      document.addEventListener("keydown", event => {
+        if (currentState.view !== "photos") return;
+        if (event.key === "Escape") { event.preventDefault(); closeGallery(); return; }
+        if (event.key === "ArrowLeft") { event.preventDefault(); moveGallery(-1); return; }
+        if (event.key === "ArrowRight") { event.preventDefault(); moveGallery(1); return; }
+        if (event.key === "Tab") {
+          const focusable = $$("#photoViewer button:not(:disabled)");
+          if (!focusable.length) return;
+          const first = focusable[0], last = focusable[focusable.length - 1];
+          if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
+          else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
+        }
+      });
+      let touchStart = null;
+      $("#viewerStage").addEventListener("touchstart", event => {
+        if (event.touches.length === 1) touchStart = { x: event.touches[0].clientX, y: event.touches[0].clientY }; else touchStart = null;
+      }, { passive: true });
+      $("#viewerStage").addEventListener("touchend", event => {
+        if (!touchStart || event.changedTouches.length !== 1) return;
+        const dx = event.changedTouches[0].clientX - touchStart.x;
+        const dy = event.changedTouches[0].clientY - touchStart.y;
+        if (Math.abs(dx) > 48 && Math.abs(dx) > Math.abs(dy) * 1.25) moveGallery(dx < 0 ? 1 : -1);
+        touchStart = null;
+      }, { passive: true });
+      $("#viewerStage").addEventListener("touchcancel", () => { touchStart = null; }, { passive: true });
+      bindImageFallbacks();
+      history.replaceState({ view: "auth", scrollTop: 0 }, "", "#auth");
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,71 @@
+{
+  "schemaVersion": 2,
+  "title": "Freight Mobile",
+  "colors": {
+    "graphite": "#17191b",
+    "graphiteRaised": "#222529",
+    "graphiteSoft": "#30343a",
+    "warmPaper": "#f2f0e9",
+    "warmPaperMuted": "#e7e3d9",
+    "paperWhite": "#fffdf8",
+    "mutedInk": "#615f59",
+    "manifestRule": "#cbc6b9",
+    "signalOrange": "#ff5c19",
+    "signalOrangeDeep": "#a93208",
+    "successGreen": "#1f7242",
+    "dangerRed": "#a92f25"
+  },
+  "typography": {
+    "body": {
+      "fontFamily": "Arial, system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif",
+      "fontSize": "15px",
+      "lineHeight": 1.45
+    },
+    "secondary": {
+      "fontSize": "12px",
+      "lineHeight": 1.4
+    },
+    "display": {
+      "fontFamily": "Arial Narrow, Roboto Condensed, Arial, system-ui, sans-serif",
+      "fontSize": "26px",
+      "fontWeight": 800,
+      "lineHeight": 1.15
+    },
+    "mono": {
+      "fontFamily": "ui-monospace, SF Mono, Menlo, Consolas, Roboto Mono, Liberation Mono, Courier New, monospace"
+    }
+  },
+  "geometry": {
+    "cornerRadius": "0px",
+    "separator": "1px solid manifestRule",
+    "ordinarySurfaceShadow": "none"
+  },
+  "layout": {
+    "mobileFullBleedMaxWidth": "599px",
+    "desktopFrameMinWidth": "600px",
+    "desktopFrameMaxWidth": "390px",
+    "topbarHeight": "56px + safe-area-inset-top",
+    "bottomNavigationHeight": "56px + safe-area-inset-bottom",
+    "screenScrolls": true,
+    "documentScrolls": false,
+    "safeArea": ["top", "right", "bottom", "left"]
+  },
+  "controls": {
+    "touchTargetMinHeight": "44px",
+    "navigationRowMinHeight": "48px",
+    "fieldMinHeight": "48px",
+    "inputFontSize": "16px",
+    "paperFieldBorder": "#857f73",
+    "darkFieldBorder": "#6b7075",
+    "focusWidth": "2px"
+  },
+  "interactions": {
+    "navigation": "hash-only and file:// safe",
+    "profile": "bottom navigation screen",
+    "orderStates": ["searching", "assigned", "loading", "in_transit", "delivered", "cancelled"],
+    "reportRanges": ["month", "quarter", "year"],
+    "photos": ["counter", "thumbnails", "previous/next", "swipe", "Escape", "focus return"],
+    "motion": "honor prefers-reduced-motion",
+    "externalRequests": "none until a user opens a 2GIS route"
+  }
+}
